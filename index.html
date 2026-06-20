@@ -1497,12 +1497,13 @@ function exportToExcel(){
     monthEntriesXls.forEach(([label, v]) => {
       perBulan.push([label, v.count, v.debet, v.kredit, v.lastSaldo]);
     });
-    perBulan.push(['TOTAL', s.total, s.totalDebet, s.totalKredit, s.saldoAkhir]);
     const nMonthsXls = monthEntriesXls.length || 1;
+    const totalSaldoPerBulanXls = monthEntriesXls.reduce((a,[,v])=>a+(v.lastSaldo||0),0);
+    perBulan.push(['TOTAL', s.total, s.totalDebet, s.totalKredit, totalSaldoPerBulanXls]);
     const avgCountPerBulanXls = monthEntriesXls.reduce((a,[,v])=>a+v.count,0) / nMonthsXls;
     const avgDebetPerBulanXls = monthEntriesXls.reduce((a,[,v])=>a+v.debet,0) / nMonthsXls;
     const avgKreditPerBulanXls = monthEntriesXls.reduce((a,[,v])=>a+v.kredit,0) / nMonthsXls;
-    const avgSaldoPerBulanXls = monthEntriesXls.reduce((a,[,v])=>a+(v.lastSaldo||0),0) / nMonthsXls;
+    const avgSaldoPerBulanXls = totalSaldoPerBulanXls / nMonthsXls;
     perBulan.push([
       'RATA-RATA',
       Math.round(avgCountPerBulanXls * 10) / 10,
@@ -1709,16 +1710,17 @@ function exportToPdf(){
       label, String(v.count), fmtRupiah(v.debet), fmtRupiah(v.kredit), fmtRupiah(v.lastSaldo),
     ]);
     const nMonths = monthEntries.length || 1;
+    const totalSaldoPerBulan = monthEntries.reduce((a,[,v])=>a+(v.lastSaldo||0),0);
     const avgCountPerBulan = monthEntries.reduce((a,[,v])=>a+v.count,0) / nMonths;
     const avgDebetPerBulan = monthEntries.reduce((a,[,v])=>a+v.debet,0) / nMonths;
     const avgKreditPerBulan = monthEntries.reduce((a,[,v])=>a+v.kredit,0) / nMonths;
-    const avgSaldoPerBulan = monthEntries.reduce((a,[,v])=>a+(v.lastSaldo||0),0) / nMonths;
+    const avgSaldoPerBulan = totalSaldoPerBulan / nMonths;
     monthRows.push([
       { content:'TOTAL', styles:{fontStyle:'bold'} },
       { content: String(s.total), styles:{fontStyle:'bold', halign:'right'} },
       { content: fmtRupiah(s.totalDebet), styles:{fontStyle:'bold', halign:'right'} },
       { content: fmtRupiah(s.totalKredit), styles:{fontStyle:'bold', halign:'right'} },
-      { content: fmtRupiah(s.saldoAkhir), styles:{fontStyle:'bold', halign:'right'} },
+      { content: fmtRupiah(totalSaldoPerBulan), styles:{fontStyle:'bold', halign:'right'} },
     ]);
     monthRows.push([
       { content:'RATA-RATA', styles:{fontStyle:'bold'} },
